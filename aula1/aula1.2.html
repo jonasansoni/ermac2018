@@ -11854,9 +11854,10 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="2.1.-Modelo-simplificado:-Equa&#231;&#227;o-de-transporte">2.1. Modelo simplificado: Equa&#231;&#227;o de transporte<a class="anchor-link" href="#2.1.-Modelo-simplificado:-Equa&#231;&#227;o-de-transporte">&#182;</a></h3><p>\begin{equation}
 \frac{\partial c}{\partial t} = -u \frac{\partial c}{\partial x}+ k \frac{\partial^2 c}{\partial x^2}
+\tag{1}
 \end{equation}</p>
 <div class="alert alert-danger" role="alert">
-  <center><h5> Termo advectivo (convectivo) + Temo difusivo: Equação de transporte</h5>
+  <p> Termo advectivo (convectivo) + Temo difusivo: Equação de transporte</p>
 </div>
 </div>
 </div>
@@ -11868,10 +11869,11 @@ div#notebook {
 <p>Vamos desprezar inicialmente o termo difusivo: $k \frac{\partial^2 c}{\partial x^2}$. Temos então a equação de advecção (convecção), em que $u&gt;0$ é constante:</p>
 <p>\begin{equation}
 \frac{\partial c}{\partial t} + u \frac{\partial c}{\partial x} = 0 \Longrightarrow \frac{\partial c}{\partial t} = -u \frac{\partial c}{\partial x}
+\tag{2}
 \end{equation}
 onde o termo $-u \frac{\partial c}{\partial x}$ é o termo convectivo, inercial ou advectivo.</p>
 <p>A equação representa uma <em>onda</em> propagando com velocidade $u$ na direção $x$. Com condição inicial $c(x,0)=c_0(x)$ conforme a figura abaixo, a equação tem solução exata dada por:</p>
-<p>\begin{equation}c(x,t)=c_0(x-ut)\end{equation}</p>
+<p>\begin{equation}c(x,t)=c_0(x-ut)\tag{3}\end{equation}</p>
 <p><img src="./figuras/fig2.png" width="65%" label="assa"></p>
 <h4><center> Figura 2. Modelagem de uma nuvem de poluente.</h4>
 <div class="alert alert-warning" role="alert">
@@ -11895,7 +11897,7 @@ onde o termo $-u \frac{\partial c}{\partial x}$ é o termo convectivo, inercial 
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <div class="alert alert-warning" role="alert">
-  <p><font color='red'> _Vamos ver agora como resolver numericamente essa equação da onda, e verificar quais as conseguencias das nossas escolhas de qual metodologia numérica utilizada._</font></p>
+  <h4><font color='red'> _Vamos ver agora como resolver numericamente essa equação da onda, e verificar quais as conseguencias das nossas escolhas de qual metodologia numérica utilizada._</font></h4>
 </div>
 </div>
 </div>
@@ -11943,8 +11945,108 @@ c_i^n &amp;=&amp; c(i\, \Delta x, n\, \Delta t)
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3><font color='red'> Desenvolvimento <em>"The Flash"</em> dos métodos de diferença finitas na lousa.</h3>
+<p><font color="blue"> Graficamente:</p>
+<p><img src="figuras/FDapproxiamtions.png" alt="FTBS_stencil"></p>
+<h4><center> Figura 4. Pontos utilizados aproximações derivada primeira ordem.</h4>
+<p>Seja $f$ uma função contínua</p>
+<ul>
+<li><p>Aproximação por diferença atrasada (<em>backward</em>): 
+$\frac{\partial f}{\partial x} \approx \frac{f_i - f_{i-1}}{\Delta x}$</p>
+</li>
+<li><p>Aproximação por diferença adiantada (<em>forward</em>): 
+$\frac{\partial f}{\partial x} \approx \frac{f_{i+1} - f_{i}}{\Delta x}$</p>
+</li>
+<li><p>Aproximação por diferença central: 
+$\frac{\partial f}{\partial x} \approx \frac{f_{i+1} - f_{i-1}}{2\Delta x}$</p>
+</li>
+</ul>
+<h4 id="Expans&#227;o-em-s&#233;rie-de-Taylor">Expans&#227;o em s&#233;rie de Taylor<a class="anchor-link" href="#Expans&#227;o-em-s&#233;rie-de-Taylor">&#182;</a></h4><p>Supondo uma função $f$ qualquer contínua no intervalo $[a, b]$ de interesse e que possua derivada até ordem $N$ contínuas nesse intervalo, o Teorema de Taylor permite escrever, para todo $x \in [a,b]$,</p>
+<p>\begin{equation}
+f(x)=f(x_i)+(\Delta x) \frac{\partial f}{\partial x}\big|_i + \frac{(\Delta x)^2}{2!} \frac{\partial ^2 f}{\partial x^2}\big|_i + \frac{(\Delta x)^3}{3!} \frac{\partial ^3 f}{\partial x^3}\big|_i + ...
+\tag{4}
+\end{equation}</p>
+<p>em que $\Delta x=x-x_i$.</p>
+<p>Queremos determinar a primeira derivada de uma função $f$ no ponto $x_i$. Expandindo $f(x_i + \Delta x)$ em série de Taylor em torno do ponto $x_i$</p>
+<p>\begin{equation}
+f(x_i+\Delta x)=f(x_i)+(\Delta x) \frac{\partial f}{\partial x}\big|_i + \frac{(\Delta x)^2}{2!} \frac{\partial ^2 f}{\partial x^2}\big|_i + \frac{(\Delta x)^3}{3!} \frac{\partial ^3 f}{\partial x^3}\big|_i + ...
+\tag{5}
+\end{equation}</p>
+<p>Isolando a primeira derivada $\frac{\partial c}{\partial x}\big|_i$, podemos escrever:</p>
+<p>\begin{equation}
+\frac{\partial f}{\partial x}\big|_i = \frac{f(x_i+\Delta x) - f(x_i)}{\Delta x}+ \left[-\frac{(\Delta x)}{2!} \frac{\partial ^2 f}{\partial x^2}\big|_i - \frac{(\Delta x)^2}{3!} \frac{\partial ^3 f}{\partial x^3}\big|_i - ...\right]
+\tag{6}
+\end{equation}</p>
+<p>A expressão 6 indica que a primeira derivada (<strong>diferenças progressivas</strong>) é:</p>
+<p>\begin{equation}
+\frac{\partial f}{\partial x}\big|_i = \frac{f(x_i+\Delta x) - f(x_i)}{\Delta x} + ELT
+\tag{7}
+\end{equation}</p>
+<p>onde</p>
+<p>\begin{equation}
+ELT = \left[-\frac{(\Delta x)}{2!} \frac{\partial ^2 f}{\partial x^2}\big|_i - \frac{(\Delta x)^2}{3!} \frac{\partial ^3 f}{\partial x^3}\big|_i - ...\right]
+\end{equation}</p>
+<p>é o <em>erro local de truncamento</em>. Este erro aparece porque utilizamos um número finito de termos na série de Taylor. O ELT fornece uma medida da diferença entre o valor exato da derivada e sua aproximação numérica, indicando também como essa diferença varia com a redução do $\Delta x$.</p>
+<p>Como é considerado $0&lt;\Delta x&lt;1$, supõem-se que o termo dominante do ELT será o primeiro, isto é, aquele com a menor potência de $\Delta x$.</p>
+<p>Os termos do ELT (Eq. 7) são então representados por ${\mathcal O}(\Delta x)$ ("ordem $\Delta x$. (Obs. A expressão  do tipo ${\mathcal O}(\Delta x)$ somente indica como o erro local de truncamento varia com o refinamento da malha, e não o valor do erro.</p>
+<p>Realizando o mesmo processo a partir da expressão $f(x_i - \Delta x)$ em série de Taylor em torno do ponto $x_i$:</p>
+<p>\begin{equation}
+f(x_i-\Delta x)=f(x_i)-(\Delta x) \frac{\partial f}{\partial x}\big|_i + \frac{(\Delta x)^2}{2!} \frac{\partial^2 f}{\partial x^2}\big|_i + {\mathcal O}(\Delta x)^3
+\tag{8}
+\end{equation}</p>
+<p>Isolando a primeira derivada temos:</p>
+<p>\begin{equation}
+\frac{\partial f}{\partial x}\big|_i = \frac{f_{i}-f_{i-1}}{\Delta x}+{\mathcal O}(\Delta x)
+\tag{9}
+\end{equation}</p>
+<p>que é outra aproximação para a derivada primeira. (<strong>diferenças atrasadas</strong>)</p>
+<p>Realizando a subtração das expressões 5 e 8 ($f(x_i+\Delta x)-f(x_i-\Delta x)$), de modo a eliminar o termo contendo a segunda derivada de $f$, obtemos:</p>
+<p>\begin{equation}
+f(x_i+\Delta x)=f(x_i)+(\Delta x) \frac{\partial f}{\partial x}\big|_i + \frac{(\Delta x)^2}{2!} \frac{\partial^2 f}{\partial x^2}\big|_i + {\mathcal O}(\Delta x)^3
+\end{equation}</p>
+<p>\begin{equation}
+f(x_i-\Delta x)=f(x_i)-(\Delta x) \frac{\partial f}{\partial x}\big|_i + \frac{(\Delta x)^2}{2!} \frac{\partial^2 f}{\partial x^2}\big|_i + {\mathcal O}(\Delta x)^3
+\end{equation}</p>
+<p>Obtemos</p>
+<p>\begin{equation}
+\frac{\partial f}{\partial x}\big|_i = \frac{f_{i+i}-f_{i-1}}{2 \Delta x}+{\mathcal O}(\Delta x)^2
+\tag{10}
+\end{equation}</p>
+<p>Observe que a expressão anterior utiliza os pontos $x_{i-1}$ e $x_{i+1}$ para o cálculo da primeira derivada de $f$ no ponto central $x_i$. Assim esta expressão é denominada aproximação por <strong>diferenças centrais</strong>. Ela também é uma aproximação de ordem 2.</p>
+<p>Realizando a soma das expressões 5 e 8 ($f(x_i+\Delta x)+f(x_i-\Delta x)$) e realizando as operações de isolar o termo derivativo de menor ordem, obtemos a seguinte expressão:</p>
+<p>\begin{equation}
+\frac{\partial^2 f}{\partial x^2}\big|_i = \frac{f_{i+i}-2f_i+f_{i-1}}{(\Delta x)^2}+{\mathcal O}(\Delta x)^2
+\tag{11}
+\end{equation}</p>
+<p>o que é uma aproximação para derivadas de segunda ordem.</p>
 <div class="alert alert-light" role="alert">
-  https://www.youtube.com/watch?v=iz22_37mMkk&list=PL30F4C5ABCE62CB61&index=5
+  Para ver uma explicação passo-a-passo assista a aula
+  (https://www.youtube.com/watch?v=iz22_37mMkk&list=PL30F4C5ABCE62CB61&index=5)
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="alert alert-success" role="alert">
+  <h4 class="alert-heading">Em resumo temos até agora:</h4>
+  <p>Diferenças progressivas:</p>
+  <p>\begin{equation}
+       \frac{\partial f}{\partial x}\big|_i = \frac{f_{i+i}-f_i}{(\Delta x)}+{\mathcal O}(\Delta x)
+    \end{equation}</p>
+  <p>Diferenças atrasadas:</p>
+  <p>\begin{equation}
+       \frac{\partial f}{\partial x}\big|_i = \frac{f_{i}-f_{i-1}}{(\Delta x)}+{\mathcal O}(\Delta x)
+    \end{equation}</p>
+    <p>Diferenças centrais:</p>
+  <p>\begin{equation}
+       \frac{\partial f}{\partial x}\big|_i = \frac{f_{i+i}-f_{i-1}}{2 \Delta x}+{\mathcal O}(\Delta x)^2
+    \end{equation}</p>
+    <p>Diferenças para derivadas de segunda ordem:</p>
+  <p>\begin{equation}
+       \frac{\partial^2 f}{\partial x^2}\big|_i = \frac{f_{i+i}-2f_i+f_{i-1}}{(\Delta x)^2}+{\mathcal O}(\Delta x)^2
+    \end{equation}</p>  
 </div>
 </div>
 </div>
@@ -11966,7 +12068,8 @@ c_i^n &amp;=&amp; c(i\, \Delta x, n\, \Delta t)
 <p>Considerando a derivada em relação ao tempo e discretizando com diferenças progressivas:</p>
 <p>\begin{equation}\frac{\partial c}{\partial t}(i\Delta x, n\Delta t)\approx \frac{c^{n+1}_i-c^n_i}{\Delta t}\end{equation}</p>
 <p>Aproximando a derivada para o espaço com diferenças atrasadas:</p>
-<p>\begin{equation}\frac{\partial c}{\partial x}(i\Delta x, n\Delta t)\approx \frac{c^{n}_i-c^n_{i-1}}{\Delta x}\end{equation}</p>
+<p>\begin{equation}
+\frac{\partial c}{\partial x}(i\Delta x, n\Delta t)\approx \frac{c^{n}_i-c^n_{i-1}}{\Delta x}\end{equation}</p>
 <p>Esta discretização é chamada de <font color='blue'> **upwind,** </font> em que a aproximação da derivada espacial depende da direção de propagação das caracteristicas (na direção de onde vem o escoamento).</p>
 <p>Para a equação abordada $u&gt;0$ e aplicando a discretização <em>upwind</em> acima representada, temos:</p>
 <p>\begin{equation} \frac{c^{n+1}_i-c^n_i}{\Delta t}+u\frac{c^{n}_i-c^n_{i-1}}{\Delta x}=0 \end{equation}
@@ -12563,7 +12666,8 @@ Para isto, utilizamos a função <code>numpy.where</code> para retornar uma list
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Hmm. Isso é bem interessante: como no caso linear, vemos que perdemos os lados afiados da nossa onda quadrada inicial, mas há mais. Agora, a onda também perdeu simetria! Parece estar ficando para trás, enquanto a frente da onda está se inclinando. Essa é outra forma de erro numérico, você pode se perguntar? Não! É física!</p>
-<h5 id="Pense-um-pouco!!!">Pense um pouco!!!<a class="anchor-link" href="#Pense-um-pouco!!!">&#182;</a></h5><p>Pense no efeito de ter substituído a velocidade de onda constante $u$ pela velocidade variável dada pela solução $c$. Isso significa que diferentes partes da onda se movem em velocidades diferentes. Faça um esboço de uma onda inicial e pense em onde a velocidade é mais alta e onde ela é mais baixa ...</p>
+<h4><font color="orange"> Pense um pouco!!!</h4>
+<p>Pense no efeito de ter substituído a velocidade de onda constante $u$ pela velocidade variável dada pela solução $c$. Isso significa que diferentes partes da onda se movem em velocidades diferentes. Faça um esboço de uma onda inicial e pense em onde a velocidade é mais alta e onde ela é mais baixa ...</p>
 
 </div>
 </div>
